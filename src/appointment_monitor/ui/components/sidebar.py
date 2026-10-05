@@ -1,4 +1,4 @@
-"""Navigation sidebar for the appointment-monitor dashboard."""
+"""Navigation sidebar for the product monitor dashboard."""
 
 from pathlib import Path
 
@@ -58,7 +58,7 @@ class Sidebar(QFrame):
 		app_status = QLabel("●  Demo data loaded")
 		app_status.setObjectName("sidebarStatus")
 		layout.addWidget(app_status)
-		version = QLabel("APPOINTMENT MONITOR  ·  0.1.0")
+		version = QLabel("PRODUCT MONITOR  ·  0.1.0")
 		version.setObjectName("versionLabel")
 		layout.addWidget(version)
 
