@@ -2,8 +2,8 @@ from unittest.mock import MagicMock
 
 from selenium.common.exceptions import WebDriverException
 
-from appointment_monitor.detector import Availability
-from appointment_monitor.monitor import ProductMonitor
+from product_monitor.detector import Availability
+from product_monitor.monitor import ProductMonitor
 
 
 def test_check_detects_product_with_active_order_control():

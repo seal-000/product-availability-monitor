@@ -4,7 +4,7 @@ import pytest
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 
-from appointment_monitor.browser import BrowserSession
+from product_monitor.browser import BrowserSession
 
 
 def test_start_session_prefers_chrome_and_sets_timeout():
@@ -12,8 +12,8 @@ def test_start_session_prefers_chrome_and_sets_timeout():
     chrome_driver = MagicMock()
 
     with (
-        patch("appointment_monitor.browser.webdriver.Chrome", return_value=chrome_driver) as chrome,
-        patch("appointment_monitor.browser.webdriver.Edge") as edge,
+        patch("product_monitor.browser.webdriver.Chrome", return_value=chrome_driver) as chrome,
+        patch("product_monitor.browser.webdriver.Edge") as edge,
     ):
         driver = session.start_session()
 
@@ -29,10 +29,10 @@ def test_start_session_falls_back_to_edge_when_chrome_fails():
 
     with (
         patch(
-            "appointment_monitor.browser.webdriver.Chrome",
+            "product_monitor.browser.webdriver.Chrome",
             side_effect=WebDriverException("Chrome unavailable"),
         ),
-        patch("appointment_monitor.browser.webdriver.Edge", return_value=edge_driver),
+        patch("product_monitor.browser.webdriver.Edge", return_value=edge_driver),
     ):
         driver = session.start_session()
 
@@ -45,11 +45,11 @@ def test_start_session_raises_when_all_browsers_fail():
 
     with (
         patch(
-            "appointment_monitor.browser.webdriver.Chrome",
+            "product_monitor.browser.webdriver.Chrome",
             side_effect=WebDriverException("Chrome unavailable"),
         ),
         patch(
-            "appointment_monitor.browser.webdriver.Edge",
+            "product_monitor.browser.webdriver.Edge",
             side_effect=WebDriverException("Edge unavailable"),
         ),
     ):
@@ -63,8 +63,8 @@ def test_start_session_reuses_existing_driver():
     session._driver = existing_driver
 
     with (
-        patch("appointment_monitor.browser.webdriver.Chrome") as chrome,
-        patch("appointment_monitor.browser.webdriver.Edge") as edge,
+        patch("product_monitor.browser.webdriver.Chrome") as chrome,
+        patch("product_monitor.browser.webdriver.Edge") as edge,
     ):
         assert session.start_session() is existing_driver
 
@@ -78,9 +78,9 @@ def test_fetch_navigates_and_returns_page_source():
     driver.page_source = "<html>available</html>"
     session._driver = driver
 
-    result = session.fetch("https://example.com/appointments")
+    result = session.fetch("https://example.com/products")
 
-    driver.get.assert_called_once_with("https://example.com/appointments")
+    driver.get.assert_called_once_with("https://example.com/products")
     assert result == "<html>available</html>"
 
 
@@ -92,13 +92,13 @@ def test_fetch_waits_for_requested_element():
     expected_condition = MagicMock()
 
     with (
-        patch("appointment_monitor.browser.WebDriverWait") as wait_class,
+        patch("product_monitor.browser.WebDriverWait") as wait_class,
         patch(
-            "appointment_monitor.browser.EC.presence_of_element_located",
+            "product_monitor.browser.EC.presence_of_element_located",
             return_value=expected_condition,
         ) as presence_of_element_located,
     ):
-        result = session.fetch("https://example.com/appointments", locator, 2.5)
+        result = session.fetch("https://example.com/products", locator, 2.5)
 
     wait_class.assert_called_once_with(driver, 2.5)
     presence_of_element_located.assert_called_once_with(locator)
@@ -113,7 +113,7 @@ def test_fetch_reraises_webdriver_errors():
     session._driver = driver
 
     with pytest.raises(WebDriverException, match="navigation failed"):
-        session.fetch("https://example.com/appointments")
+        session.fetch("https://example.com/products")
 
 
 def test_close_quits_driver_and_clears_session():

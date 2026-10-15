@@ -4,12 +4,12 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QPushButton
 
-from appointment_monitor.config import AppConfig, TwilioConfig
-from appointment_monitor.detector import Availability, DetectorResult
-from appointment_monitor.ui.views import dashboard_view
-from appointment_monitor.ui.views.dashboard_view import (
+from product_monitor.config import AppConfig, TwilioConfig
+from product_monitor.detector import Availability, DetectorResult
+from product_monitor.ui.views import dashboard_view
+from product_monitor.ui.views.dashboard_view import (
     MONITOR_RECORDS_KEY,
     DashboardView,
     _CheckWorker,
@@ -81,8 +81,8 @@ def test_legacy_monitor_without_product_name_is_not_started(monkeypatch, qapp):
                 [
                     {
                         "id": "legacy-monitor",
-                        "name": "Old appointment monitor",
-                        "url": "https://example.com/appointments",
+                        "name": "Old product monitor",
+                        "url": "https://example.com/products",
                         "interval": 300,
                     }
                 ]
@@ -149,7 +149,7 @@ def test_unknown_result_sets_error_status_and_logs_at_error_level(
     monitor = view.monitors[0]
 
     with caplog.at_level(
-        "ERROR", logger="appointment_monitor.ui.views.dashboard_view"
+        "ERROR", logger="product_monitor.ui.views.dashboard_view"
     ):
         view._check_finished(
             monitor["id"],
@@ -215,6 +215,35 @@ def test_check_worker_sends_alert_after_new_available_result(monkeypatch):
     assert results[0][2] == ()
 
 
+def test_check_worker_always_reports_when_alert_sending_crashes(monkeypatch):
+    results = []
+
+    class FakeMonitor:
+        def __init__(self, _url, _product_name):
+            pass
+
+        def check(self):
+            return DetectorResult(Availability.AVAILABLE, "in stock")
+
+        def close(self):
+            pass
+
+    def crash(*_args):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(dashboard_view, "ProductMonitor", FakeMonitor)
+    monkeypatch.setattr(dashboard_view, "send_availability_notifications", crash)
+    worker = _CheckWorker(
+        "id", "Item", "Item", "https://example.com", create_config(), True
+    )
+    worker.signals.finished.connect(lambda *args: results.append(args))
+
+    worker.run()
+
+    assert results[0][1].availability == Availability.AVAILABLE
+    assert results[0][2] == ("Alert failed: boom",)
+
+
 def test_available_monitor_displays_notification_delivery_failure(
     monkeypatch, qapp
 ):
@@ -239,5 +268,101 @@ def test_available_monitor_displays_notification_delivery_failure(
 
     assert monitor["status"] == "Running"
     assert "SMS delivery failed" in monitor["result"]
+    view.shutdown()
+    view.close()
+
+
+def test_compact_monitor_actions_stay_inside_the_table_panel(monkeypatch, qapp):
+    view = create_view(monkeypatch, FakeSettings(), create_config())
+    buttons = view.findChildren(QPushButton, "monitorActionButton")
+
+    assert len(buttons) == 5
+    assert all(button.parentWidget() is view.table.parentWidget() for button in buttons)
+    assert [button.text() for button in buttons] == [
+        "Remove",
+        "Start",
+        "Stop",
+        "Start All",
+        "Stop All",
+    ]
+
+    view.shutdown()
+    view.close()
+
+
+class FakeTray:
+    instances = []
+
+    def __init__(self, *_args):
+        self.messages = []
+        FakeTray.instances.append(self)
+
+    @staticmethod
+    def isSystemTrayAvailable():
+        return True
+
+    class MessageIcon:
+        Information = 1
+
+    def show(self):
+        pass
+
+    def hide(self):
+        pass
+
+    def showMessage(self, title, message, *_args):
+        self.messages.append((title, message))
+
+
+def _view_with_available_monitor(monkeypatch, desktop_enabled):
+    FakeTray.instances = []
+    monkeypatch.setattr(dashboard_view, "QSystemTrayIcon", FakeTray)
+    config = create_config()
+    config.desktop_notifications_enabled = desktop_enabled
+    view = create_view(monkeypatch, FakeSettings(), config)
+    monkeypatch.setattr(view, "_run_check", lambda _monitor_id: None)
+    view._add_monitor(
+        {
+            "name": "Original Glazed Dozen",
+            "product_name": "Original Glazed Dozen",
+            "url": "https://example.com/order",
+            "interval": 300,
+        }
+    )
+    return view
+
+
+def test_desktop_notification_shown_once_when_product_becomes_available(
+    monkeypatch, qapp
+):
+    view = _view_with_available_monitor(monkeypatch, desktop_enabled=True)
+    monitor_id = view.monitors[0]["id"]
+    available = DetectorResult(Availability.AVAILABLE, "active purchase button")
+
+    view._check_finished(monitor_id, available)
+    view._check_finished(monitor_id, available)
+
+    (tray,) = FakeTray.instances
+    assert len(tray.messages) == 1
+    assert "Original Glazed Dozen" in tray.messages[0][0]
+
+    view._check_finished(
+        monitor_id, DetectorResult(Availability.UNAVAILABLE, "sold out")
+    )
+    view._check_finished(monitor_id, available)
+    assert len(tray.messages) == 2
+    view.shutdown()
+    view.close()
+
+
+def test_desktop_notification_not_shown_when_disabled(monkeypatch, qapp):
+    view = _view_with_available_monitor(monkeypatch, desktop_enabled=False)
+
+    view._check_finished(
+        view.monitors[0]["id"],
+        DetectorResult(Availability.AVAILABLE, "active purchase button"),
+    )
+
+    assert FakeTray.instances == []
     view.shutdown()
     view.close()
