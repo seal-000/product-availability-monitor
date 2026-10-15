@@ -1,8 +1,8 @@
 from urllib.parse import parse_qs
 
-from appointment_monitor.config import AppConfig, EmailConfig, TwilioConfig
-from appointment_monitor.notifications import send_availability_notifications
-from appointment_monitor import notifications
+from product_monitor.config import AppConfig, EmailConfig, TwilioConfig
+from product_monitor.notifications import send_availability_notifications
+from product_monitor import notifications
 
 
 class FakeResponse:

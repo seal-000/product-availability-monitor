@@ -1,8 +1,9 @@
 import json
+import time
 
 import pytest
 
-from appointment_monitor.detector import (
+from product_monitor.detector import (
     Availability,
     detect_product_availability,
 )
@@ -319,3 +320,22 @@ def test_page_mode_requires_matching_heading():
     result = detect_product_availability(NEWEGG_STYLE_PAGE, "Radeon RX 9070")
 
     assert result.availability == Availability.UNKNOWN
+
+
+def test_large_page_is_analyzed_quickly():
+    items = "".join(
+        f'<li class="item-cell"><div><span></span><a href="/p/{n}">Other monitor {n}</a>'
+        f"<button>Add to cart</button></div></li>"
+        for n in range(1500)
+    )
+    page = (
+        "<html><body><h1>GIGABYTE 27 inch QHD 2K 1440P</h1>"
+        '<button title="Add to cart">Add to cart</button>'
+        f"<ul>{items}</ul></body></html>"
+    )
+
+    started = time.perf_counter()
+    result = detect_product_availability(page, "GIGABYTE 27 inch QHD 2K 1440P")
+
+    assert time.perf_counter() - started < 5
+    assert result.availability == Availability.AVAILABLE

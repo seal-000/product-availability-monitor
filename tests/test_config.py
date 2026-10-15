@@ -1,4 +1,4 @@
-from appointment_monitor import config
+from product_monitor import config
 
 
 class FakeSettings:

@@ -5,7 +5,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from appointment_monitor.ui.components.create_monitor_form import CreateMonitorForm
+from product_monitor.ui.components.create_monitor_form import CreateMonitorForm
 
 
 @pytest.fixture(scope="module")
@@ -28,7 +28,7 @@ def test_form_requires_a_product_name(qapp):
 
 def test_form_emits_product_and_store_page(qapp):
     form = CreateMonitorForm(default_interval_seconds=600)
-    assert form.interval_combo.itemText(0) == "Default check interval"
+    assert form.interval_combo.itemText(0) == "Default"
     assert form.interval_combo.currentData() == 600
     emitted = []
     form.monitor_created.connect(emitted.append)
