@@ -1,0 +1,1 @@
+"""Application views, including the main window and dashboard page."""

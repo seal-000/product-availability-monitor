@@ -1,0 +1,350 @@
+/* GLOBAL */
+QWidget {
+	color: #1F2937;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 13px;
+}
+
+QMainWindow, #content {
+	background: #F3F4F6;
+}
+
+#settingsScroll, #dashboardScroll {
+	background: #F3F4F6;
+}
+
+#settingsContent, #dashboardContent {
+	background: #F3F4F6;
+}
+
+/* SIDEBAR */
+#sidebar {
+	background: #111827;
+	color: #9CA3AF;
+	border-right: 1px solid #1F2937;
+}
+
+#brand {
+	color: #FFFFFF;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	padding: 12px 0;
+}
+
+#navButton {
+	color: #9CA3AF;
+	text-align: left;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	font-weight: 500;
+}
+
+#navButton:hover {
+	background: #1F2937;
+	color: #F9FAFB;
+}
+
+#navButton:checked {
+	color: #FFFFFF;
+	background: #2563EB; /* Azul primario para la opción activa */
+	font-weight: 600;
+}
+
+#sidebarStatus {
+	color: #10B981;
+	font-size: 11px;
+}
+
+#versionLabel {
+	color: #6B7280;
+	font-size: 10px;
+}
+
+/* CONTENIDO Y TARJETAS */
+#pageHeading {
+	color: #111827;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+#aboutIntro {
+	color: #374151;
+	font-size: 16px;
+}
+
+#aboutSectionTitle {
+	color: #111827;
+	font-size: 15px;
+	font-weight: 700;
+}
+
+#aboutBody {
+	color: #4B5563;
+	font-size: 14px;
+}
+
+#panel {
+	background: #FFFFFF;
+	border: 1px solid #E5E7EB;
+	border-radius: 10px;
+}
+
+#sectionLabel, #formLabel {
+	color: #6B7280;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+}
+
+/* CONTEXT MENUS (right-click copy/paste) */
+QMenu {
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 1px solid #D1D5DB;
+}
+
+QMenu::item {
+	background-color: transparent;
+	color: #000000;
+	
+}
+
+QMenu::item:selected {
+	background-color: #E5E7EB;
+	color: #000000;
+}
+
+QMenu::item:disabled {
+	color: #ab4e42;
+}
+
+QMenu::separator {
+	height: 1px;
+	background: #E5E7EB;
+	color: #000000;
+}
+
+/* INPUTS & COMBOBOX */
+QLineEdit, QComboBox, QSpinBox {
+	color: #1F2937;
+	background: #FFFFFF;
+	border: 1px solid #D1D5DB;
+	border-radius: 6px;
+	padding: 8px 12px;
+	min-height: 20px;
+}
+
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus {
+	border: 1px solid #2563EB;
+}
+
+QComboBox::drop-down {
+	border: none;
+	width: 24px;
+}
+
+QComboBox::down-arrow {
+	image: url("imgs/dropdown-chevron.svg");
+	width: 10px;
+	height: 10px;
+}
+
+/* CHECKBOXES */
+QCheckBox {
+	color: #374151;
+	spacing: 8px;
+	font-weight: 500;
+	padding: 0px 3px;
+}
+
+QCheckBox::indicator {
+	width: 18px;
+	height: 18px;
+	border: 1px solid #9CA3AF;
+	border-radius: 4px;
+	background: #FFFFFF;
+}
+
+QCheckBox::indicator:hover {
+	border-color: #2563EB;
+}
+
+QCheckBox::indicator:checked {
+	background: #D1FAE5;
+	border-color: #059669;
+	image: url("imgs/check_icon.svg");
+}
+
+/* BOTONES */
+QPushButton {
+	color: #374151;
+	background: #FFFFFF;
+	border: 1px solid #D1D5DB;
+	border-radius: 6px;
+	padding: 8px 14px;
+	font-weight: 500;
+}
+
+QPushButton:hover {
+	background: #F9FAFB;
+	border-color: #9CA3AF;
+}
+
+#monitorActionButton {
+	padding: 4px 8px;
+	font-size: 12px;
+}
+
+#startMonitoringButton {
+	color: #FFFFFF;
+	background: #2563EB;
+	border: 1px solid #2563EB;
+	border-radius: 6px;
+	font-weight: 600;
+	padding: 9px 16px;
+}
+
+#startMonitoringButton:hover {
+	background: #1D4ED8;
+	border-color: #1D4ED8;
+}
+
+/* TABLA MODERNIZADA */
+QTableWidget {
+	background: #FFFFFF;
+	border: 1px solid #E5E7EB;
+	border-radius: 8px;
+	gridline-color: transparent;
+	outline: 0;
+}
+
+QTableWidget::item {
+	padding: 10px 12px;
+	border-bottom: 1px solid #F3F4F6;
+}
+
+QTableWidget::item:selected {
+	background: #EFF6FF;
+	color: #1E40AF;
+}
+
+QHeaderView::section {
+	color: #6B7280;
+	background: #F9FAFB;
+	border: none;
+	border-bottom: 1px solid #E5E7EB;
+	padding: 10px 12px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+/* NOTIFICACIONES Y STATUS TAGS */
+#statusTag[variant="success"] {
+	color: #065F46;
+	background: #D1FAE5;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+#statusTag[variant="info"] {
+	color: #1E40AF;
+	background: #DBEAFE;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+#statusTag[variant="warning"] {
+	color: #92400E;
+	background: #FEF3C7;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+#statusTag[variant="neutral"] {
+	color: #4B5563;
+	background: #E5E7EB;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+#statusTag[variant="error"] {
+	color: #991B1B;
+	background: #FEE2E2;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+#lastCheckText {
+	color: #4B5563;
+}
+
+#lastCheckText[variant="error"] {
+	color: #991B1B;
+}
+
+#logOutput {
+	color: #FFFFFF;
+	background: #111827;
+	border: 1px solid #374151;
+	border-radius: 6px;
+	selection-background-color: #2563EB;
+	selection-color: #FFFFFF;
+}
+
+#unavailablePhrases, #availablePhrases {
+	background: #FFFFFF;
+	border: 1px solid #E5E7EB;
+	border-radius: 10px;
+	padding: 6px 4px 4px 4px;
+	
+}
+
+#notificationTitle {
+	color: #111827;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+#notificationHeaderIcon {
+	background: transparent;
+}
+
+#notificationChannel {
+	background: #F9FAFB;
+	padding: 0px 2px;
+}
+
+#notificationChannelName {
+	color: #1F2937;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#notificationContact {
+	color: #6B7280;
+	font-size: 12px;
+}
+
+
+#success {
+	color: #059669;
+}
+
+#warning {
+	color: #DC2626;
+}
