@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "product-availability-monitor"
+version = "0.1.0"
+description = "A desktop app for monitoring product availability."
+requires-python = ">=3.11"
+dependencies = ["selenium>=4.11", "PyQt6>=6.6", "keyring>=25", "python-dotenv>=1.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"product_monitor.ui" = ["resources/*.qss", "resources/imgs/*.svg", "resources/imgs/*.ico"]
