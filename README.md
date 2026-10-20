@@ -6,6 +6,9 @@
 
 - [Project overview](#project-overview)
 - [Features](#features)
+- [Engineering decisions](#engineering-decisions)
+- [Availability detection: evidence and limits](#availability-detection-evidence-and-limits)
+- [Demo](#demo)
 - [Screenshots](#screenshots)
 - [Project structure](#project-structure)
 - [Requirements](#requirements)
@@ -33,6 +36,71 @@ It is built with Python, PyQt6, and Selenium, and it can monitor product pages, 
 - Secure credential storage via the OS keyring
 - Local app settings persisted with Qt settings
 
+## Engineering decisions
+
+- **Keep the UI responsive:** Selenium checks and notification delivery run in
+  `QThreadPool` workers, with a maximum of three workers at a time. Qt signals
+  return results to the UI, and a monitor is not checked again while its prior
+  check is still in flight.
+- **Alert on availability changes, not every poll:** The app remembers each
+  monitor's last result in memory and sends alerts when a check reports
+  available after a non-available result. Repeated available checks do not send
+  duplicate alerts; an unavailable or unknown result allows a later available
+  result to alert again. This state is not persisted, so restarting the app can
+  cause an alert on the first available check. Failed alerts are shown and
+  logged, but are not automatically retried while the product remains
+  available.
+- **Separate preferences from secrets:** Qt `QSettings` stores notification
+  preferences, provider details, polling interval, and monitor definitions.
+  Twilio and SMTP passwords are stored in the operating system keyring.
+  Environment variables can supply fallback values. If the keyring cannot be
+  accessed while saving, the UI reports the problem and does not save those
+  settings.
+- **Make failures visible and keep checking:** Browser or unexpected check
+  failures are logged and reported as an unknown/error result instead of being
+  treated as out of stock. Handled notification delivery errors are returned
+  per channel, displayed with the monitor result, and logged; the other enabled
+  channel is still attempted.
+
+The worker, alert-transition, delivery-failure, and credential-storage
+behaviors are covered in [`tests/test_dashboard_view.py`](tests/test_dashboard_view.py)
+and [`tests/test_settings_view.py`](tests/test_settings_view.py).
+
+## Availability detection: evidence and limits
+
+The detector analyzes the page HTML returned by Selenium and reports a status
+only when it finds stock evidence associated with the requested product. It
+supports:
+
+- Matching `Product` JSON-LD structured data with recognized Schema.org
+  availability values, such as `InStock` and `OutOfStock`
+- A matching product card or item container with a stock-status attribute,
+  unavailable wording (for example, “Sold out”), or an enabled purchase action
+  (for example, “Add to cart” or “Customize”)
+- A single-product page with one matching `<h1>` and a recognizable purchase
+  control outside a product card
+
+| Representative page evidence | Result | Automated example |
+| --- | --- | --- |
+| Matching product JSON-LD offer says `InStock` | Available | `test_structured_product_stock_status_matches_the_named_product` |
+| Matching product card says “Sold out” | Unavailable | `test_krispy_kreme_out_of_stock_badge_takes_precedence_over_disabled_order_button` |
+| Matching product card has an enabled “Add to order” button | Available | `test_product_card_checks_only_the_matching_item` |
+| Product is found, but only a disabled purchase control is present | Unknown | `test_unrelated_available_text_does_not_mark_product_available` |
+| Requested product cannot be identified on the page | Unknown | `test_page_without_the_named_product_is_unknown` |
+
+These cases are covered in [`tests/test_detector.py`](tests/test_detector.py).
+“Unknown” is intentional: general page text like “available today” is not
+enough to establish that the requested item is in stock. The detector can also
+return unknown when the product or its stock signal is missing from the fetched
+HTML, when the storefront uses markup or wording it does not recognize, or
+when the page requires a pickup location before showing inventory.
+
+This is a general HTML-based detector, not a retailer-specific integration.
+Storefront markup, localization, variants, and inventory rules differ, so a
+recognized signal is not a guarantee that checkout will succeed. Check the
+result against the store page; some sites may need a selected store or a
+different ordering URL.
+
 ## Screenshots
 
 ### Dashboard
@@ -57,13 +125,17 @@ Review recent checks and results.
 
 Shown as a system tray toast when a monitored product becomes available.
 
-![Windows desktop notification reporting a product is available](docs/screenshots/desktop-notification.png)
+![Windows desktop notification reporting a product is available](docs/screenshots/desktop_notification.png)
 
 ### Email notification
 
 Sent through SMTP with the product name, page link, and stock evidence.
 
 ![Email alert reporting a product is available](docs/screenshots/email_notification.png)
+
+## Demo
+
+[Watch the app demo recording](docs/recording.mp4)
 
 ## Project structure
 

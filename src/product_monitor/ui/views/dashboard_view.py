@@ -104,7 +104,7 @@ class DashboardView(QWidget):
 		*,
 		app_config: AppConfig | None = None,
 	) -> None:
-		"""Build the dashboard and populate it with fictional monitor records."""
+		"""Build the dashboard and load saved monitor definitions."""
 		super().__init__(parent)
 		self.app_config = app_config or AppConfig.load()
 		self._settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
