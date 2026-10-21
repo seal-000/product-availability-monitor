@@ -1,3 +1,7 @@
+
+
+
+
 # Product Availability Monitor
 
 [![Tests](https://github.com/seal-000/product-availability-monitor/actions/workflows/tests.yml/badge.svg)](https://github.com/seal-000/product-availability-monitor/actions/workflows/tests.yml)
@@ -135,7 +139,7 @@ Sent through SMTP with the product name, page link, and stock evidence.
 
 ## Demo
 
-[Watch the app demo recording](docs/recording.mp4)
+https://github.com/user-attachments/assets/c2f2868c-9c20-4e87-9f15-e6ae8fca3b6f
 
 ## Project structure
 
