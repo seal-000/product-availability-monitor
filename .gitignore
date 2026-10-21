@@ -6,3 +6,5 @@ __pycache__/
 *.pyd
 config.json
 *.egg-info/
+build/
+dist/
